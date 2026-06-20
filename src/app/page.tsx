@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 
 const IMAGES = [
@@ -38,6 +38,9 @@ const SplitText = ({ text, delayOffset = 0 }: { text: string; delayOffset?: numb
 
 export default function ComingSoon() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -46,6 +49,33 @@ export default function ComingSoon() {
   // Parallax effects
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -300]);
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus("submitting");
+    
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_FORM_ENDPOINT || "https://formspree.io/f/YOUR_FORM_ID", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        setEmail("");
+      } else {
+        setStatus("error");
+      }
+    } catch (error) {
+      setStatus("error");
+    }
+  };
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -83,23 +113,8 @@ export default function ComingSoon() {
         {/* Left Column - Content (Sticky) */}
         <div className="sticky top-0 flex h-screen w-full flex-col justify-center px-8 py-16 lg:w-5/12 lg:px-20 lg:py-20 xl:w-1/2">
           
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="mb-12 lg:mb-24"
-          >
-            <div className="inline-flex items-center gap-2 rounded-sm border border-zinc-200 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-400">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-zinc-400 opacity-75"></span>
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-zinc-500"></span>
-              </span>
-              Archive In Progress
-            </div>
-          </motion.div>
-
           <div className="mb-16 lg:mb-24">
-            <h2 className="mb-4 overflow-hidden text-[10px] font-medium uppercase tracking-[0.25em] text-zinc-400 sm:text-xs">
+            <h2 className="mb-8 overflow-hidden text-[10px] font-medium uppercase tracking-[0.25em] text-zinc-400 sm:text-xs">
               <SplitText text="Visual Artist & Photographer" delayOffset={0.3} />
             </h2>
             
@@ -111,7 +126,7 @@ export default function ComingSoon() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 1.2, ease: "easeOut" }}
-              className="mt-8 sm:mt-10"
+              className="mt-12 sm:mt-16"
             >
               <p className="max-w-[320px] text-xs font-light leading-loose tracking-wide text-zinc-500 sm:max-w-md sm:text-sm">
                 Ethiopian visual artist and fashion photographer. Finding rhythm, intention, and beauty in the darkest, most overlooked places. A new digital portfolio is currently being crafted.
@@ -141,6 +156,47 @@ export default function ComingSoon() {
               <svg className="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
               <span>Contact</span>
             </a>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.8, ease: "easeOut" }}
+            className="mt-16 max-w-[320px] sm:max-w-sm"
+          >
+            <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-500">
+              Be the first to see the full portfolio
+            </p>
+            <form className="flex w-full items-end gap-4" onSubmit={handleSubmit}>
+              <div className="relative w-full">
+                <input 
+                  type="email" 
+                  placeholder="Email address" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === "submitting" || status === "success"}
+                  className="w-full border-b border-zinc-300 bg-transparent px-0 py-2 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-900 disabled:opacity-50"
+                  required
+                />
+              </div>
+              <button 
+                type="submit" 
+                disabled={status === "submitting" || status === "success"}
+                className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-900 transition-colors hover:text-zinc-500 disabled:opacity-50"
+              >
+                {status === "submitting" ? "Sending..." : status === "success" ? "Done" : "Submit"}
+              </button>
+            </form>
+            {status === "success" && (
+              <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.1em] text-green-600">
+                Thank you! We'll be in touch soon.
+              </p>
+            )}
+            {status === "error" && (
+              <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.1em] text-red-600">
+                Oops! Something went wrong. Please try again.
+              </p>
+            )}
           </motion.div>
         </div>
 
