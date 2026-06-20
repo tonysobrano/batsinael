@@ -110,8 +110,8 @@ export default function ComingSoon() {
 
       <main className="relative z-10 mx-auto flex min-h-[150vh] max-w-screen-2xl flex-col lg:flex-row lg:items-start">
         
-        {/* Left Column - Content (Sticky) */}
-        <div className="sticky top-0 flex h-screen w-full flex-col justify-center px-8 py-16 lg:w-5/12 lg:px-20 lg:py-20 xl:w-1/2">
+        {/* Left Column - Content (Sticky on Desktop) */}
+        <div className="relative lg:sticky top-0 flex min-h-[85vh] lg:h-screen w-full flex-col justify-center px-8 py-16 lg:w-5/12 lg:px-20 lg:py-20 xl:w-1/2">
           
           <div className="mb-16 lg:mb-24">
             <h2 className="mb-8 overflow-hidden text-[10px] font-medium uppercase tracking-[0.25em] text-zinc-400 sm:text-xs">
