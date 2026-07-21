@@ -8,17 +8,18 @@ interface ProjectGridProps {
 
 export function ProjectGrid({ projects }: ProjectGridProps) {
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+    <div className="columns-1 gap-x-[22px] sm:columns-2 md:columns-3 lg:columns-4">
       {projects.map((project, index) => (
-        <div key={`${project.path}-${index}`} className="break-inside-avoid">
+        <div key={`${project.path}-${index}`} className="break-inside-avoid mb-[34px]">
           <Link href={project.path} className="group block">
             <SkeletonImage
               src={project.cover}
               alt={project.name}
-              wrapperClassName="mb-2"
-              className="group-hover:scale-[1.02]"
+              wrapperClassName="mb-[10px] min-h-0"
+              className="group-hover:scale-[1.015]"
+              priority={index < 4}
             />
-            <p className="text-[11px] uppercase tracking-[0.15em] text-gray-500 group-hover:text-black transition-colors duration-300">
+            <p className="text-[12px] leading-[1.35] text-black opacity-55 transition-opacity duration-200 group-hover:opacity-100 md:text-[10px]">
               {project.name}
             </p>
           </Link>

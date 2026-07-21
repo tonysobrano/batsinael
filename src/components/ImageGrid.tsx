@@ -18,20 +18,20 @@ export function ImageGrid({ images }: ImageGridProps) {
 
   return (
     <>
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 md:gap-8 space-y-4 md:space-y-8">
+      <div className="columns-1 gap-x-[22px] sm:columns-2 md:columns-3 lg:columns-4">
         {images.map((src, i) => (
-          <motion.div 
-            key={src} 
+          <motion.div
+            key={src}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.05 }}
-            className="break-inside-avoid relative group cursor-pointer"
+            className="group relative cursor-pointer break-inside-avoid mb-[34px]"
             onClick={() => setSelectedIndex(i)}
           >
-            <SkeletonImage 
-              src={src} 
-              alt={`Gallery image ${i + 1}`} 
-              wrapperClassName="block"
+            <SkeletonImage
+              src={src}
+              alt={`Gallery image ${i + 1}`}
+              wrapperClassName="min-h-0"
               className="group-hover:opacity-90"
             />
           </motion.div>

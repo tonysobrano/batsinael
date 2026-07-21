@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Mail } from "lucide-react";
 import clsx from "clsx";
@@ -25,66 +25,58 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Accordion state
-  const [projectsOpen, setProjectsOpen] = useState(pathname.startsWith("/projects"));
-  const [brandsOpen, setBrandsOpen] = useState(pathname.startsWith("/brands"));
-  const [portraitsOpen, setPortraitsOpen] = useState(pathname.startsWith("/portraits"));
+  const [projectsOpen, setProjectsOpen] = useState(false);
+  const [brandsOpen, setBrandsOpen] = useState(false);
+  const [portraitsOpen, setPortraitsOpen] = useState(false);
+  const projectsActive = pathname.startsWith("/projects");
+  const brandsActive = pathname.startsWith("/brands");
+  const portraitsActive = pathname.startsWith("/portraits");
 
-  useEffect(() => {
+  const handleNavigate = () => {
     setIsOpen(false);
-    
-    if (pathname === "/") {
-      setProjectsOpen(false);
-      setBrandsOpen(false);
-      setPortraitsOpen(false);
-    }
-    
-    // Auto-open accordion if we navigate to a child route
-    if (pathname.startsWith("/projects")) setProjectsOpen(true);
-    if (pathname.startsWith("/brands")) setBrandsOpen(true);
-    if (pathname.startsWith("/portraits")) setPortraitsOpen(true);
-  }, [pathname]);
+  };
 
   const navLinkClasses = (path: string, exact = false) => {
     const isActive = exact ? pathname === path : pathname.startsWith(path);
     return clsx(
-      "text-[11px] md:text-xs tracking-[0.15em] transition-colors duration-300 capitalize block py-[2px]",
-      isActive ? "text-black font-medium" : "text-gray-400 hover:text-black"
+      "block py-px text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:text-[10px]",
+      isActive ? "opacity-100" : "opacity-65 hover:opacity-100"
     );
   };
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full justify-between pb-8">
+  const renderSidebarContent = () => (
+    <div className="flex min-h-full flex-col">
       <div>
-        <nav className="flex flex-col gap-2 mt-16">
-          <Link href="/" className={navLinkClasses("/", true)}>Home</Link>
-          
+        <nav className="flex flex-col gap-[5px]">
+          <Link href="/" onClick={handleNavigate} className={navLinkClasses("/", true)}>Home</Link>
+
           {/* Projects Accordion */}
           <div>
-            <Link 
+            <Link
               href="/projects"
-              onClick={(e) => {
-                if (pathname.startsWith("/projects")) {
-                  setProjectsOpen(!projectsOpen);
+              onClick={() => {
+                if (projectsActive) {
+                  setProjectsOpen((open) => !open);
                 }
+                handleNavigate();
               }}
               className={clsx(
-                "text-[11px] md:text-xs tracking-[0.15em] transition-colors duration-300 capitalize w-full text-left py-[2px] block",
-                pathname.startsWith("/projects") ? "text-black font-medium" : "text-gray-400 hover:text-black"
+                "block w-full py-px text-left text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:text-[10px]",
+                projectsActive ? "opacity-100" : "opacity-65 hover:opacity-100"
               )}
             >
               Projects
             </Link>
             <AnimatePresence>
-              {projectsOpen && (
+              {(projectsOpen || projectsActive) && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden flex flex-col pl-4 mt-1 gap-0.5 border-l border-gray-100 ml-1"
+                  className="ml-1 mt-1 flex flex-col gap-[3px] overflow-hidden border-l border-gray-100 pl-2"
                 >
                   {projects.map(p => (
-                    <Link key={p.path} href={p.path} className={navLinkClasses(p.path, true)}>
+                    <Link key={p.path} href={p.path} onClick={handleNavigate} className={navLinkClasses(p.path, true)}>
                       {p.name}
                     </Link>
                   ))}
@@ -95,30 +87,31 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
 
           {/* Brands Accordion */}
           <div>
-            <Link 
+            <Link
               href="/brands"
-              onClick={(e) => {
-                if (pathname.startsWith("/brands")) {
-                  setBrandsOpen(!brandsOpen);
+              onClick={() => {
+                if (brandsActive) {
+                  setBrandsOpen((open) => !open);
                 }
+                handleNavigate();
               }}
               className={clsx(
-                "text-[11px] md:text-xs tracking-[0.15em] transition-colors duration-300 capitalize w-full text-left py-[2px] block",
-                pathname.startsWith("/brands") ? "text-black font-medium" : "text-gray-400 hover:text-black"
+                "block w-full py-px text-left text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:text-[10px]",
+                brandsActive ? "opacity-100" : "opacity-65 hover:opacity-100"
               )}
             >
               Brands
             </Link>
             <AnimatePresence>
-              {brandsOpen && (
+              {(brandsOpen || brandsActive) && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden flex flex-col pl-4 mt-1 gap-0.5 border-l border-gray-100 ml-1"
+                  className="ml-1 mt-1 flex flex-col gap-[3px] overflow-hidden border-l border-gray-100 pl-2"
                 >
                   {brands.map(p => (
-                    <Link key={p.path} href={p.path} className={navLinkClasses(p.path, true)}>
+                    <Link key={p.path} href={p.path} onClick={handleNavigate} className={navLinkClasses(p.path, true)}>
                       {p.name}
                     </Link>
                   ))}
@@ -129,30 +122,31 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
 
           {/* Portraits Accordion */}
           <div>
-            <Link 
+            <Link
               href="/portraits"
-              onClick={(e) => {
-                if (pathname.startsWith("/portraits")) {
-                  setPortraitsOpen(!portraitsOpen);
+              onClick={() => {
+                if (portraitsActive) {
+                  setPortraitsOpen((open) => !open);
                 }
+                handleNavigate();
               }}
               className={clsx(
-                "text-[11px] md:text-xs tracking-[0.15em] transition-colors duration-300 capitalize w-full text-left py-[2px] block",
-                pathname.startsWith("/portraits") ? "text-black font-medium" : "text-gray-400 hover:text-black"
+                "block w-full py-px text-left text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:text-[10px]",
+                portraitsActive ? "opacity-100" : "opacity-65 hover:opacity-100"
               )}
             >
               Portraits
             </Link>
             <AnimatePresence>
-              {portraitsOpen && (
+              {(portraitsOpen || portraitsActive) && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden flex flex-col pl-4 mt-1 gap-0.5 border-l border-gray-100 ml-1"
+                  className="ml-1 mt-1 flex flex-col gap-[3px] overflow-hidden border-l border-gray-100 pl-2"
                 >
                   {portraits.map(p => (
-                    <Link key={p.path} href={p.path} className={navLinkClasses(p.path, true)}>
+                    <Link key={p.path} href={p.path} onClick={handleNavigate} className={navLinkClasses(p.path, true)}>
                       {p.name}
                     </Link>
                   ))}
@@ -161,15 +155,19 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
             </AnimatePresence>
           </div>
 
-          <Link href="/about" className={navLinkClasses("/about")}>About</Link>
+          <Link href="/about" onClick={handleNavigate} className={navLinkClasses("/about")}>About</Link>
         </nav>
       </div>
 
+      <Link href="/" onClick={handleNavigate} className="mt-[22px] text-[12px] leading-[1.35] text-black opacity-80 transition-opacity duration-200 hover:opacity-100 md:text-[10px]">
+        Shop
+      </Link>
+
       {/* Social Icons */}
-      <div className="flex gap-4 items-center text-gray-400">
-        <a href="#" className="hover:text-black transition-colors"><InstagramIcon /></a>
-        <a href="mailto:contact@batsinael.com" className="hover:text-black transition-colors"><Mail size={16} /></a>
-        <a href="#" className="hover:text-black transition-colors"><LinkedinIcon /></a>
+      <div className="mt-[17px] flex items-center gap-[9px] text-black">
+        <a href="#" aria-label="Instagram" className="opacity-90 transition-opacity duration-200 hover:opacity-100 [&_svg]:size-[14px] md:[&_svg]:size-[11px]"><InstagramIcon /></a>
+        <a href="mailto:contact@batsinael.com" aria-label="Email" className="opacity-90 transition-opacity duration-200 hover:opacity-100"><Mail className="size-[14px] md:size-[11px]" strokeWidth={2.2} /></a>
+        <a href="#" aria-label="LinkedIn" className="opacity-90 transition-opacity duration-200 hover:opacity-100 [&_svg]:size-[14px] md:[&_svg]:size-[11px]"><LinkedinIcon /></a>
       </div>
     </div>
   );
@@ -177,7 +175,7 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md flex items-center justify-end px-6 py-6 border-b border-gray-100">
+      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-end border-b border-gray-100 bg-white/90 px-6 py-6 backdrop-blur-md md:hidden">
         <button onClick={() => setIsOpen(!isOpen)} className="text-black">
           {isOpen ? <X size={24} strokeWidth={1} /> : <Menu size={24} strokeWidth={1} />}
         </button>
@@ -191,16 +189,16 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "-100%" }}
             transition={{ type: "tween", duration: 0.3 }}
-            className="md:hidden fixed inset-0 z-30 bg-white pt-24 px-6 overflow-y-auto"
+            className="fixed inset-0 z-30 overflow-y-auto bg-white px-6 pt-24 md:hidden"
           >
-            <SidebarContent />
+            {renderSidebarContent()}
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Desktop Fixed Sidebar */}
-      <aside className="hidden md:block fixed top-0 left-0 bottom-0 w-[250px] p-12 border-r border-gray-50 overflow-y-auto bg-white z-40">
-        <SidebarContent />
+      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-[140px] overflow-y-auto bg-white pb-10 pl-[53px] pr-4 pt-[143px] md:block">
+        {renderSidebarContent()}
       </aside>
     </>
   );
