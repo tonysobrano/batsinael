@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       },
     ],
     formats: ["image/webp"],
-    qualities: [90, 92],
+    qualities: [75, 90, 92],
   },
 };
 

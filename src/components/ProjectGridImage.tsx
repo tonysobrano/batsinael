@@ -33,6 +33,7 @@ export function ProjectGridImage({
   const containerRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
   const isInViewRef = useRef(false);
+  const isMobileViewportRef = useRef(false);
   const prefersReducedMotionRef = useRef(false);
   const autoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -87,12 +88,13 @@ export function ProjectGridImage({
       !hasMultiple ||
       isHoveredRef.current ||
       !isInViewRef.current ||
+      !isMobileViewportRef.current ||
       prefersReducedMotionRef.current
     ) {
       return;
     }
 
-    const delay = 4500 + Math.random() * 5500;
+    const delay = 3200 + Math.random() * 2800;
     autoTimeoutRef.current = setTimeout(() => {
       if (!isHoveredRef.current && isInViewRef.current) {
         advance();
@@ -100,6 +102,22 @@ export function ProjectGridImage({
       scheduleNextRotation();
     }, delay);
   }, [advance, autoRotate, clearAutoRotate, hasMultiple]);
+
+  useEffect(() => {
+    const mobileViewportQuery = window.matchMedia("(max-width: 767px)");
+    const syncMobileViewport = () => {
+      isMobileViewportRef.current = mobileViewportQuery.matches;
+      if (!mobileViewportQuery.matches) {
+        clearAutoRotate();
+      } else if (isInViewRef.current) {
+        scheduleAutoRotate();
+      }
+    };
+
+    syncMobileViewport();
+    mobileViewportQuery.addEventListener("change", syncMobileViewport);
+    return () => mobileViewportQuery.removeEventListener("change", syncMobileViewport);
+  }, [clearAutoRotate, scheduleAutoRotate]);
 
   useEffect(() => {
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -195,7 +213,7 @@ export function ProjectGridImage({
           aria-hidden={activeLayer !== "a"}
           fill
           sizes={gridSizes}
-          quality={90}
+          quality={75}
           loading={eager && layerAIndex === 0 ? "eager" : "lazy"}
           fetchPriority={eager && layerAIndex === 0 ? "high" : "auto"}
           onLoad={() => handleLayerLoaded("a", layerAIndex)}
@@ -208,7 +226,7 @@ export function ProjectGridImage({
             aria-hidden={activeLayer !== "b"}
             fill
             sizes={gridSizes}
-            quality={90}
+            quality={75}
             loading="lazy"
             onLoad={() => handleLayerLoaded("b", layerBIndex)}
             className={layerClass("b")}

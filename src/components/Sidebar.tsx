@@ -37,6 +37,9 @@ const MailIcon = () => (
 export function Sidebar({ projects, brands, portraits }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<
+    "projects" | "brands" | "portraits" | null
+  >(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const projectsActive = pathname.startsWith("/projects");
@@ -98,6 +101,10 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
     setIsOpen(false);
   };
 
+  const toggleSection = (section: "projects" | "brands" | "portraits") => {
+    setExpandedSection((current) => (current === section ? null : section));
+  };
+
   const navLinkClasses = (path: string, exact = false) => {
     const isActive = exact ? pathname === path : pathname.startsWith(path);
     return clsx(
@@ -106,101 +113,98 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
     );
   };
 
-  const renderSidebarContent = () => (
-    <div className="flex min-h-full flex-col">
-      <div>
-        <nav className="flex flex-col">
-          <Link href="/" onClick={handleNavigate} className={navLinkClasses("/", true)}>Home</Link>
-
-          {/* Projects Accordion */}
-          <div>
-            <Link
-              href="/projects"
-              onClick={handleNavigate}
-              className={clsx(
-                "flex min-h-11 w-full items-center text-left text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:min-h-6 md:text-[10px]",
-                projectsActive ? "opacity-100" : "opacity-65 hover:opacity-100"
-              )}
-            >
-              Projects
-            </Link>
-            {projectsActive && (
-              <div className="sidebar-subnav-enter ml-1 flex flex-col overflow-hidden border-l border-gray-100 pl-2">
-                {projects.map(p => (
-                  <Link key={p.path} href={p.path} onClick={handleNavigate} className={navLinkClasses(p.path, true)}>
-                    {p.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Brands Accordion */}
-          <div>
-            <Link
-              href="/brands"
-              onClick={handleNavigate}
-              className={clsx(
-                "flex min-h-11 w-full items-center text-left text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:min-h-6 md:text-[10px]",
-                brandsActive ? "opacity-100" : "opacity-65 hover:opacity-100"
-              )}
-            >
-              Brands
-            </Link>
-            {brandsActive && (
-              <div className="sidebar-subnav-enter ml-1 flex flex-col overflow-hidden border-l border-gray-100 pl-2">
-                {brands.map(p => (
-                  <Link key={p.path} href={p.path} onClick={handleNavigate} className={navLinkClasses(p.path, true)}>
-                    {p.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Portraits Accordion */}
-          <div>
-            <Link
-              href="/portraits"
-              onClick={handleNavigate}
-              className={clsx(
-                "flex min-h-11 w-full items-center text-left text-[12px] leading-[1.35] text-black transition-opacity duration-200 md:min-h-6 md:text-[10px]",
-                portraitsActive ? "opacity-100" : "opacity-65 hover:opacity-100"
-              )}
-            >
-              Portraits
-            </Link>
-            {portraitsActive && (
-              <div className="sidebar-subnav-enter ml-1 flex flex-col overflow-hidden border-l border-gray-100 pl-2">
-                {portraits.map(p => (
-                  <Link key={p.path} href={p.path} onClick={handleNavigate} className={navLinkClasses(p.path, true)}>
-                    {p.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <Link href="/about" onClick={handleNavigate} className={navLinkClasses("/about")}>About</Link>
-        </nav>
-      </div>
-
-      <a href="mailto:contact@batsinael.com" className="mt-[14px] flex min-h-11 items-center text-[12px] leading-[1.35] text-black opacity-80 transition-opacity duration-200 hover:opacity-100 md:min-h-6 md:text-[10px]">
+  const renderContactLinks = (mobile = false) => (
+    <div className={mobile ? "mt-auto pt-12" : "mt-auto pt-8"}>
+      <a
+        href="mailto:contact@batsinael.com"
+        className={clsx(
+          "flex items-center text-black opacity-80 transition-opacity duration-200 hover:opacity-100",
+          mobile ? "min-h-11 text-[12px]" : "min-h-6 text-[10px]",
+        )}
+      >
         Contact
       </a>
-
-      {/* Social Icons */}
-      <div className="mt-[9px] flex items-center text-black">
-        <a href="https://instagram.com/batsinael" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex size-11 items-center justify-center opacity-90 transition-opacity duration-200 hover:opacity-100 md:size-6 [&_svg]:size-[14px] md:[&_svg]:size-[11px]"><InstagramIcon /></a>
-        <a href="mailto:contact@batsinael.com" aria-label="Email" className="inline-flex size-11 items-center justify-center opacity-90 transition-opacity duration-200 hover:opacity-100 md:size-6 [&_svg]:size-[14px] md:[&_svg]:size-[11px]"><MailIcon /></a>
+      <div className={clsx("mt-2 flex items-center text-black", mobile ? "gap-1" : "-ml-2") }>
+        <a href="https://instagram.com/batsinael" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={clsx("inline-flex items-center justify-center opacity-90 transition-opacity duration-200 hover:opacity-100", mobile ? "size-11" : "size-6 [&_svg]:size-[11px]")}><InstagramIcon /></a>
+        <a href="mailto:contact@batsinael.com" aria-label="Email" className={clsx("inline-flex items-center justify-center opacity-90 transition-opacity duration-200 hover:opacity-100", mobile ? "size-11" : "size-6 [&_svg]:size-[11px]")}><MailIcon /></a>
       </div>
+    </div>
+  );
+
+  const renderDesktopSidebarContent = () => (
+    <div className="flex h-full flex-col">
+      <nav className="flex flex-col" aria-label="Primary navigation">
+        <Link href="/" className={navLinkClasses("/", true)}>Home</Link>
+        <div>
+          <Link href="/projects" className={navLinkClasses("/projects")}>Projects</Link>
+          {projectsActive && (
+            <div className="sidebar-subnav-enter ml-1 flex flex-col overflow-hidden border-l border-gray-100 pl-2">
+              {projects.map((project) => <Link key={project.path} href={project.path} className={navLinkClasses(project.path, true)}>{project.name}</Link>)}
+            </div>
+          )}
+        </div>
+        <div>
+          <Link href="/brands" className={navLinkClasses("/brands")}>Brands</Link>
+          {brandsActive && (
+            <div className="sidebar-subnav-enter ml-1 flex flex-col overflow-hidden border-l border-gray-100 pl-2">
+              {brands.map((brand) => <Link key={brand.path} href={brand.path} className={navLinkClasses(brand.path, true)}>{brand.name}</Link>)}
+            </div>
+          )}
+        </div>
+        <div>
+          <Link href="/portraits" className={navLinkClasses("/portraits")}>Portraits</Link>
+          {portraitsActive && (
+            <div className="sidebar-subnav-enter ml-1 flex flex-col overflow-hidden border-l border-gray-100 pl-2">
+              {portraits.map((portrait) => <Link key={portrait.path} href={portrait.path} className={navLinkClasses(portrait.path, true)}>{portrait.name}</Link>)}
+            </div>
+          )}
+        </div>
+        <Link href="/about" className={navLinkClasses("/about")}>About</Link>
+      </nav>
+      {renderContactLinks()}
+    </div>
+  );
+
+  const renderMobileSection = (
+    section: "projects" | "brands" | "portraits",
+    label: string,
+    path: string,
+    items: { name: string; path: string }[],
+  ) => {
+    const isExpanded = expandedSection === section;
+    return (
+      <div className="border-b border-black/10">
+        <div className="flex min-h-16 items-center justify-between gap-4">
+          <Link href={path} onClick={handleNavigate} className="flex flex-1 items-center py-3 text-[22px] font-medium tracking-[-0.05em] text-black">{label}</Link>
+          <button type="button" onClick={() => toggleSection(section)} aria-expanded={isExpanded} aria-controls={`${section}-mobile-links`} className="inline-flex size-11 items-center justify-center text-[11px] font-medium uppercase tracking-[0.08em] text-black" aria-label={`${isExpanded ? "Hide" : "Show"} ${label.toLowerCase()}`}>{isExpanded ? "Hide" : "Show"}</button>
+        </div>
+        {isExpanded && (
+          <div id={`${section}-mobile-links`} className="sidebar-subnav-enter grid gap-1 pb-4 pl-1">
+            {items.map((item) => <Link key={item.path} href={item.path} onClick={handleNavigate} className={clsx("flex min-h-11 items-center text-[13px] text-black/65 transition-colors hover:text-black", pathname === item.path && "text-black")}>{item.name}</Link>)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderMobileMenu = () => (
+    <div className="flex min-h-full flex-col">
+      <nav className="flex flex-col" aria-label="Primary navigation">
+        <Link href="/" onClick={handleNavigate} className="flex min-h-16 items-center border-b border-black/10 text-[22px] font-medium tracking-[-0.05em] text-black">Home</Link>
+        {renderMobileSection("projects", "Projects", "/projects", projects)}
+        {renderMobileSection("brands", "Brands", "/brands", brands)}
+        {renderMobileSection("portraits", "Portraits", "/portraits", portraits)}
+        <Link href="/about" onClick={handleNavigate} className="flex min-h-16 items-center border-b border-black/10 text-[22px] font-medium tracking-[-0.05em] text-black">About</Link>
+      </nav>
+      {renderContactLinks(true)}
     </div>
   );
 
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-end border-b border-gray-100 bg-white/90 px-[14px] py-[14px] backdrop-blur-md md:hidden">
+      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-gray-100 bg-white/90 px-[18px] py-[14px] backdrop-blur-md md:hidden">
+        <Link href="/" onClick={handleNavigate} className="text-[21px] font-medium leading-none tracking-[-0.09em] text-black" aria-label="Batsinael home">batsinael</Link>
         <button
           ref={menuButtonRef}
           type="button"
@@ -230,12 +234,13 @@ export function Sidebar({ projects, brands, portraits }: SidebarProps) {
             : "pointer-events-none -translate-x-full opacity-0",
         )}
       >
-        {renderSidebarContent()}
+        {renderMobileMenu()}
       </div>
 
       {/* Desktop Fixed Sidebar */}
       <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-[140px] overflow-y-auto bg-white pb-10 pl-[53px] pr-4 pt-[143px] md:block">
-        {renderSidebarContent()}
+        <Link href="/" className="absolute left-[53px] top-[52px] text-[21px] font-medium leading-none tracking-[-0.09em] text-black" aria-label="Batsinael home">batsinael</Link>
+        {renderDesktopSidebarContent()}
       </aside>
     </>
   );
