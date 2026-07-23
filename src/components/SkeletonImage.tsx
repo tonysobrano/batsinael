@@ -8,7 +8,7 @@ interface SkeletonImageProps {
   className?: string;
   wrapperClassName?: string;
   eager?: boolean;
-  quality?: 90 | 92;
+  quality?: 75 | 90 | 92;
   sizes?: string;
 }
 
@@ -21,7 +21,7 @@ export function SkeletonImage({
   className,
   wrapperClassName,
   eager = false,
-  quality = 90,
+  quality = 75,
   sizes = gridSizes,
 }: SkeletonImageProps) {
   return (
