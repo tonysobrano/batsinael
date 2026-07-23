@@ -17,8 +17,22 @@ export interface PortfolioImage {
   relativePath: string;
 }
 
+export type PortfolioCategory = "projects" | "brands" | "portraits";
+
+export interface PortfolioGroup {
+  id: PortfolioCategory;
+  label: string;
+  projects: ProjectData[];
+}
+
+export interface SelectedGalleryItem {
+  name: string;
+  category: string;
+  path: string;
+  image: PortfolioImage;
+}
+
 const manifest: readonly BlobManifestEntry[] = blobManifest;
-const HOME_ROTATION_IMAGE_LIMIT = 4;
 
 function toPortfolioImage(image: BlobManifestEntry): PortfolioImage {
   return {
@@ -103,15 +117,36 @@ export function getHomeGridImages(): ProjectData[] {
     allProjects = [...allProjects, ...getProjectsWithCovers(category)];
   }
 
-  allProjects = allProjects.map((project) => ({
-    ...project,
-    images: project.images.slice(0, HOME_ROTATION_IMAGE_LIMIT),
-  }));
-
-  for (let i = allProjects.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allProjects[i], allProjects[j]] = [allProjects[j], allProjects[i]];
-  }
-
   return allProjects;
+}
+
+export function getPortfolioGroups(): PortfolioGroup[] {
+  return [
+    {
+      id: "projects",
+      label: "Projects",
+      projects: getProjectsWithCovers("img/projects"),
+    },
+    {
+      id: "brands",
+      label: "Brands",
+      projects: getProjectsWithCovers("img/brands"),
+    },
+    {
+      id: "portraits",
+      label: "Portraits",
+      projects: getProjectsWithCovers("img/portraits"),
+    },
+  ];
+}
+
+export function getSelectedGalleryItems(): SelectedGalleryItem[] {
+  return getPortfolioGroups().flatMap((group) =>
+    group.projects.map((project) => ({
+      name: project.name,
+      category: group.label,
+      path: project.path,
+      image: project.cover,
+    })),
+  );
 }

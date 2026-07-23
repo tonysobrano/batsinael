@@ -1,4 +1,4 @@
-import { ImageGrid } from "@/components/ImageGrid";
+import { ProjectGallery } from "@/components/ProjectGallery";
 import { getImagesFromDirectory, getProjectsWithCovers } from "@/lib/images";
 
 export function generateStaticParams() {
@@ -13,9 +13,10 @@ export default async function PortraitPage({ params }: { params: Promise<{ portr
   const images = getImagesFromDirectory(`img/portraits/${decodedPortrait}`);
 
   return (
-    <div className="w-full">
-      <h1 className="text-sm tracking-[0.2em] uppercase text-gray-400 mb-8">{decodedPortrait}</h1>
-      <ImageGrid images={images} />
-    </div>
+    <ProjectGallery
+      name={decodedPortrait}
+      images={images}
+      backPath="/projects"
+    />
   );
 }
