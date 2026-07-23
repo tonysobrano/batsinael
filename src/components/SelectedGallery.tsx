@@ -8,9 +8,11 @@ interface SelectedGalleryProps {
   items: SelectedGalleryItem[];
 }
 
+type IntroPhase = "visible" | "exiting" | "hidden";
+
 export function SelectedGallery({ items }: SelectedGalleryProps) {
   const [index, setIndex] = useState(0);
-  const [introVisible, setIntroVisible] = useState(true);
+  const [introPhase, setIntroPhase] = useState<IntroPhase>("visible");
   const touchStartX = useRef<number | null>(null);
   const current = items[index];
 
@@ -29,18 +31,21 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
     const root = document.documentElement;
     root.classList.add("is-preloading");
 
-    const hideTimer = window.setTimeout(
-      () => setIntroVisible(false),
-      reduceMotion ? 120 : 2350,
+    const exitTimer = window.setTimeout(
+      () => setIntroPhase("exiting"),
+      reduceMotion ? 20 : 1650,
     );
-    const unlockTimer = window.setTimeout(
-      () => root.classList.remove("is-preloading"),
-      reduceMotion ? 180 : 2950,
+    const completeTimer = window.setTimeout(
+      () => {
+        setIntroPhase("hidden");
+        root.classList.remove("is-preloading");
+      },
+      reduceMotion ? 80 : 2370,
     );
 
     return () => {
-      window.clearTimeout(hideTimer);
-      window.clearTimeout(unlockTimer);
+      window.clearTimeout(exitTimer);
+      window.clearTimeout(completeTimer);
       root.classList.remove("is-preloading");
     };
   }, []);
@@ -129,8 +134,8 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
       </div>
 
       <div
-        className={`portfolio-intro ${introVisible ? "is-visible" : ""}`}
-        aria-hidden={!introVisible}
+        className={`portfolio-intro is-${introPhase}`}
+        aria-hidden={introPhase === "hidden"}
       >
         <h1>
           <span>Batsinael</span>
