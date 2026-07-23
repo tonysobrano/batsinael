@@ -1,7 +1,4 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
 import clsx from "clsx";
 import type { PortfolioImage } from "@/lib/images";
 
@@ -27,13 +24,10 @@ export function SkeletonImage({
   quality = 90,
   sizes = gridSizes,
 }: SkeletonImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-
   return (
     <div
       className={clsx(
         "relative w-full overflow-hidden bg-gray-100",
-        !isLoaded && "animate-pulse min-h-[100px]",
         wrapperClassName
       )}
       style={{ aspectRatio: `${image.width} / ${image.height}` }}
@@ -47,10 +41,8 @@ export function SkeletonImage({
         quality={quality}
         loading={eager ? "eager" : "lazy"}
         fetchPriority={eager ? "high" : "auto"}
-        onLoad={() => setIsLoaded(true)}
         className={clsx(
-          "w-full h-auto block transition-all duration-700",
-          isLoaded ? "opacity-100" : "opacity-0",
+          "block h-auto w-full transition-transform duration-500 ease-out",
           className
         )}
       />

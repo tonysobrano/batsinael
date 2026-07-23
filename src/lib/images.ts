@@ -5,14 +5,29 @@ import {
 
 export interface ProjectData {
   name: string;
-  cover: BlobManifestEntry;
-  images: BlobManifestEntry[];
+  cover: PortfolioImage;
+  images: PortfolioImage[];
   path: string;
 }
 
-export type PortfolioImage = BlobManifestEntry;
+export interface PortfolioImage {
+  url: string;
+  width: number;
+  height: number;
+  relativePath: string;
+}
 
 const manifest: readonly BlobManifestEntry[] = blobManifest;
+const HOME_ROTATION_IMAGE_LIMIT = 4;
+
+function toPortfolioImage(image: BlobManifestEntry): PortfolioImage {
+  return {
+    url: image.url,
+    width: image.width,
+    height: image.height,
+    relativePath: image.relativePath,
+  };
+}
 
 function normalizeDirectory(directory: string): string {
   return directory
@@ -33,12 +48,13 @@ function compareImages(left: BlobManifestEntry, right: BlobManifestEntry): numbe
   );
 }
 
-export function getImagesFromDirectory(directory: string): BlobManifestEntry[] {
+export function getImagesFromDirectory(directory: string): PortfolioImage[] {
   const normalizedDirectory = normalizeDirectory(directory);
   return manifest
     .filter((image) => directoryOf(image.relativePath) === normalizedDirectory)
     .slice()
-    .sort(compareImages);
+    .sort(compareImages)
+    .map(toPortfolioImage);
 }
 
 export function getProjectsWithCovers(categoryDir: string): ProjectData[] {
@@ -60,8 +76,8 @@ export function getProjectsWithCovers(categoryDir: string): ProjectData[] {
       const orderedImages = images.slice().sort(compareImages);
       return {
         name,
-        cover: orderedImages[0],
-        images: orderedImages,
+        cover: toPortfolioImage(orderedImages[0]),
+        images: orderedImages.map(toPortfolioImage),
         path: `/${category}/${encodeURIComponent(name)}`,
         collectionOrder: Math.min(...orderedImages.map((image) => image.collectionOrder)),
       };
@@ -86,6 +102,11 @@ export function getHomeGridImages(): ProjectData[] {
   for (const category of categories) {
     allProjects = [...allProjects, ...getProjectsWithCovers(category)];
   }
+
+  allProjects = allProjects.map((project) => ({
+    ...project,
+    images: project.images.slice(0, HOME_ROTATION_IMAGE_LIMIT),
+  }));
 
   for (let i = allProjects.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

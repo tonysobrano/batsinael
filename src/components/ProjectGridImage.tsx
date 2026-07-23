@@ -30,10 +30,10 @@ export function ProjectGridImage({
   const [activeLayer, setActiveLayer] = useState<"a" | "b">("a");
   const [layerAIndex, setLayerAIndex] = useState(0);
   const [layerBIndex, setLayerBIndex] = useState<number | null>(null);
-  const [coverLoaded, setCoverLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
   const isInViewRef = useRef(false);
+  const prefersReducedMotionRef = useRef(false);
   const autoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const currentIndexRef = useRef(0);
@@ -42,10 +42,6 @@ export function ProjectGridImage({
   const hasMultiple = images.length > 1;
 
   const handleLayerLoaded = useCallback((layer: "a" | "b", index: number) => {
-    if (index === 0) {
-      setCoverLoaded(true);
-    }
-
     const pending = pendingLayerRef.current;
     if (pending?.layer === layer && pending.index === index) {
       pendingLayerRef.current = null;
@@ -86,7 +82,13 @@ export function ProjectGridImage({
 
   const scheduleAutoRotate = useCallback(function scheduleNextRotation() {
     clearAutoRotate();
-    if (!autoRotate || !hasMultiple || isHoveredRef.current || !isInViewRef.current) {
+    if (
+      !autoRotate ||
+      !hasMultiple ||
+      isHoveredRef.current ||
+      !isInViewRef.current ||
+      prefersReducedMotionRef.current
+    ) {
       return;
     }
 
@@ -98,6 +100,22 @@ export function ProjectGridImage({
       scheduleNextRotation();
     }, delay);
   }, [advance, autoRotate, clearAutoRotate, hasMultiple]);
+
+  useEffect(() => {
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncReducedMotion = () => {
+      prefersReducedMotionRef.current = reducedMotionQuery.matches;
+      if (reducedMotionQuery.matches) {
+        clearAutoRotate();
+      } else if (isInViewRef.current) {
+        scheduleAutoRotate();
+      }
+    };
+
+    syncReducedMotion();
+    reducedMotionQuery.addEventListener("change", syncReducedMotion);
+    return () => reducedMotionQuery.removeEventListener("change", syncReducedMotion);
+  }, [clearAutoRotate, scheduleAutoRotate]);
 
   useEffect(() => {
     if (!autoRotate || !hasMultiple) return;
@@ -138,7 +156,9 @@ export function ProjectGridImage({
     isHoveredRef.current = true;
     clearAutoRotate();
     advance();
-    hoverIntervalRef.current = setInterval(advance, 1600);
+    if (!prefersReducedMotionRef.current) {
+      hoverIntervalRef.current = setInterval(advance, 1600);
+    }
   };
 
   const handleMouseLeave = () => {
@@ -154,7 +174,7 @@ export function ProjectGridImage({
   const layerClass = (layer: "a" | "b") =>
     clsx(
       "object-cover transition-opacity duration-500 ease-out",
-      activeLayer === layer && coverLoaded ? "opacity-100 z-10" : "opacity-0 z-0"
+      activeLayer === layer ? "opacity-100 z-10" : "opacity-0 z-0"
     );
 
   const gridSizes =
@@ -163,10 +183,7 @@ export function ProjectGridImage({
   return (
     <div
       ref={containerRef}
-      className={clsx(
-        "relative w-full overflow-hidden bg-gray-100 mb-[10px]",
-        !coverLoaded && "animate-pulse min-h-[100px]"
-      )}
+      className="relative mb-[10px] w-full overflow-hidden bg-gray-100"
       style={{ aspectRatio: `${images[0].width} / ${images[0].height}` }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

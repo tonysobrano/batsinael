@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { PortfolioImage } from "@/lib/images";
 
 interface SingleImageViewProps {
@@ -17,6 +17,8 @@ const cursorUp = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/200
 
 export function SingleImageView({ images, initialIndex, onClose }: SingleImageViewProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const currentImage = images[currentIndex];
 
   const handleNext = useCallback((e?: React.MouseEvent) => {
@@ -31,35 +33,76 @@ export function SingleImageView({ images, initialIndex, onClose }: SingleImageVi
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") handleNext();
-      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        handleNext();
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        handlePrev();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([tabindex="-1"]), [href], [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusableElements?.length) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
     };
+
+    const previouslyFocusedElement =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousBodyOverflow = document.body.style.overflow;
+    const backgroundElements = [...document.body.children]
+      .filter((element): element is HTMLElement => (
+        element instanceof HTMLElement && element !== dialogRef.current
+      ))
+      .map((element) => ({ element, wasInert: element.inert }));
+
     window.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden"; // Prevent scrolling behind lightbox
+    document.body.style.overflow = "hidden";
+    for (const { element } of backgroundElements) {
+      element.inert = true;
+    }
+    const focusFrame = requestAnimationFrame(() => closeButtonRef.current?.focus());
+
     return () => {
+      cancelAnimationFrame(focusFrame);
       window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousBodyOverflow;
+      for (const { element, wasInert } of backgroundElements) {
+        element.inert = wasInert;
+      }
+      previouslyFocusedElement?.focus();
     };
   }, [onClose, handleNext, handlePrev]);
 
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-50 bg-white flex flex-col"
-      >
+  return createPortal(
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+      className="lightbox-enter fixed inset-0 z-50 flex flex-col bg-white"
+    >
         <div className="relative flex-1 w-full h-full flex items-center justify-center p-4 md:p-12 select-none">
           {/* Main Image */}
-          <motion.div
+          <div
             key={currentIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="pointer-events-none absolute inset-4 md:inset-12"
+            className="lightbox-image-enter pointer-events-none absolute inset-4 md:inset-12"
           >
             <Image
               src={currentImage.url}
@@ -69,43 +112,60 @@ export function SingleImageView({ images, initialIndex, onClose }: SingleImageVi
               sizes="100vw"
               className="object-contain"
             />
-          </motion.div>
+          </div>
 
           {/* Navigation Zones */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-[15%] z-10" 
-            style={{ cursor: cursorUp }} 
-            onClick={onClose} 
+          <button
+            type="button"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="absolute top-0 left-0 right-0 h-[15%] z-10"
+            style={{ cursor: cursorUp }}
+            onClick={onClose}
           />
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-[15%] z-10" 
-            style={{ cursor: cursorUp }} 
-            onClick={onClose} 
+          <button
+            type="button"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="absolute bottom-0 left-0 right-0 h-[15%] z-10"
+            style={{ cursor: cursorUp }}
+            onClick={onClose}
           />
-          <div 
-            className="absolute top-[15%] bottom-[15%] left-0 w-1/2 z-10" 
-            style={{ cursor: cursorLeft }} 
-            onClick={handlePrev} 
+          <button
+            type="button"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="absolute top-[15%] bottom-[15%] left-0 w-1/2 z-10"
+            style={{ cursor: cursorLeft }}
+            onClick={handlePrev}
           />
-          <div 
-            className="absolute top-[15%] bottom-[15%] right-0 w-1/2 z-10" 
-            style={{ cursor: cursorRight }} 
-            onClick={handleNext} 
+          <button
+            type="button"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="absolute top-[15%] bottom-[15%] right-0 w-1/2 z-10"
+            style={{ cursor: cursorRight }}
+            onClick={handleNext}
           />
         </div>
 
         {/* Bottom UI Controls */}
         <div className="absolute bottom-6 right-6 md:bottom-12 md:right-12 z-20 flex flex-col items-end gap-2 text-[10px] tracking-[0.2em] text-gray-500 uppercase font-medium">
           <div className="flex gap-4">
-            <button onClick={handlePrev} className="hover:text-black transition-colors">PREV</button>
+            <button type="button" onClick={handlePrev} className="min-h-6 hover:text-black transition-colors">PREV</button>
             <span>/</span>
-            <button onClick={handleNext} className="hover:text-black transition-colors">NEXT</button>
+            <button type="button" onClick={handleNext} className="min-h-6 hover:text-black transition-colors">NEXT</button>
           </div>
-          <button onClick={onClose} className="hover:text-black transition-colors mt-2">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            className="mt-2 min-h-6 hover:text-black transition-colors"
+          >
             SHOW THUMBNAILS
           </button>
         </div>
-      </motion.div>
-    </AnimatePresence>
+    </div>,
+    document.body,
   );
 }

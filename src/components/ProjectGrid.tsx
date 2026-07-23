@@ -28,7 +28,7 @@ export function ProjectGrid({ projects, interactiveImages = false }: ProjectGrid
               <ProjectGridImage
                 images={project.images}
                 alt={project.name}
-                eager={index < 4}
+                eager={index < 2}
                 autoRotate={shouldAutoRotate(project.path, index)}
               />
             ) : (
@@ -37,7 +37,7 @@ export function ProjectGrid({ projects, interactiveImages = false }: ProjectGrid
                 alt={project.name}
                 wrapperClassName="mb-[10px] min-h-0"
                 className="group-hover:scale-[1.015]"
-                eager={index < 4}
+                eager={index < 2}
               />
             )}
             <p className="text-[12px] leading-[1.35] text-black opacity-55 transition-opacity duration-200 group-hover:opacity-100 md:text-[10px]">
