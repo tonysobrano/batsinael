@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-07-23T15:21:32.776Z",
+  "sourceImages": 128,
+  "existingBlobObjects": 128,
+  "skippedCount": 128,
+  "uploadedCount": 0,
+  "replacedCount": 0,
+  "failedCount": 0,
+  "urlValidationCount": 128,
+  "result": "passed"
+}

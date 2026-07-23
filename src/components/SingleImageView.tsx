@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { PortfolioImage } from "@/lib/images";
 
 interface SingleImageViewProps {
-  images: string[];
+  images: PortfolioImage[];
   initialIndex: number;
   onClose: () => void;
 }
@@ -15,6 +17,7 @@ const cursorUp = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/200
 
 export function SingleImageView({ images, initialIndex, onClose }: SingleImageViewProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const currentImage = images[currentIndex];
 
   const handleNext = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -51,15 +54,22 @@ export function SingleImageView({ images, initialIndex, onClose }: SingleImageVi
       >
         <div className="relative flex-1 w-full h-full flex items-center justify-center p-4 md:p-12 select-none">
           {/* Main Image */}
-          <motion.img
+          <motion.div
             key={currentIndex}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
-            src={images[currentIndex]}
-            alt={`Image ${currentIndex + 1}`}
-            className="max-w-full max-h-full object-contain pointer-events-none"
-          />
+            className="pointer-events-none absolute inset-4 md:inset-12"
+          >
+            <Image
+              src={currentImage.url}
+              alt={`Image ${currentIndex + 1}`}
+              fill
+              quality={92}
+              sizes="100vw"
+              className="object-contain"
+            />
+          </motion.div>
 
           {/* Navigation Zones */}
           <div 

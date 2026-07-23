@@ -1,67 +1,92 @@
-import fs from 'fs';
-import path from 'path';
+import {
+  blobManifest,
+  type BlobManifestEntry,
+} from "@/lib/blob-manifest";
 
 export interface ProjectData {
   name: string;
-  cover: string;
+  cover: BlobManifestEntry;
+  images: BlobManifestEntry[];
   path: string;
 }
 
-// Get all files in a specific directory
-export function getImagesFromDirectory(dir: string): string[] {
-  const imagesPath = path.join(process.cwd(), 'public', dir);
-  try {
-    const files = fs.readdirSync(imagesPath);
-    return files
-      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
-      .map(file => encodeURI(`/${dir}/${file}`));
-  } catch (error) {
-    console.error(`Error reading directory ${imagesPath}:`, error);
-    return [];
-  }
+export type PortfolioImage = BlobManifestEntry;
+
+const manifest: readonly BlobManifestEntry[] = blobManifest;
+
+function normalizeDirectory(directory: string): string {
+  return directory
+    .replace(/^\/+/, "")
+    .replace(/^img\/?/, "")
+    .replace(/\/+$/, "");
 }
 
-// Get subdirectories (projects) within a main category (e.g., 'img/projects')
+function directoryOf(relativePath: string): string {
+  const separatorIndex = relativePath.lastIndexOf("/");
+  return separatorIndex === -1 ? "" : relativePath.slice(0, separatorIndex);
+}
+
+function compareImages(left: BlobManifestEntry, right: BlobManifestEntry): number {
+  return (
+    left.sourceOrder - right.sourceOrder ||
+    left.relativePath.localeCompare(right.relativePath, "en")
+  );
+}
+
+export function getImagesFromDirectory(directory: string): BlobManifestEntry[] {
+  const normalizedDirectory = normalizeDirectory(directory);
+  return manifest
+    .filter((image) => directoryOf(image.relativePath) === normalizedDirectory)
+    .slice()
+    .sort(compareImages);
+}
+
 export function getProjectsWithCovers(categoryDir: string): ProjectData[] {
-  const rootPath = path.join(process.cwd(), 'public', categoryDir);
-  try {
-    const items = fs.readdirSync(rootPath, { withFileTypes: true });
-    const projects: ProjectData[] = [];
+  const category = normalizeDirectory(categoryDir);
+  const collections = new Map<string, BlobManifestEntry[]>();
 
-    for (const item of items) {
-      if (item.isDirectory()) {
-        const projectPath = path.join(rootPath, item.name);
-        const files = fs.readdirSync(projectPath);
-        
-        // Find the first image to use as a cover
-        const coverFile = files.find(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file));
-        
-        if (coverFile) {
-          projects.push({
-            name: item.name,
-            cover: encodeURI(`/${categoryDir}/${item.name}/${coverFile}`),
-            path: encodeURI(`/${categoryDir.replace('img/', '')}/${item.name}`) // e.g. /projects/Ashara
-          });
-        }
-      }
+  for (const image of manifest) {
+    if (image.category !== category || image.collection === category) {
+      continue;
     }
-    return projects;
-  } catch (error) {
-    console.error(`Error reading directory ${rootPath}:`, error);
-    return [];
+
+    const images = collections.get(image.collection) ?? [];
+    images.push(image);
+    collections.set(image.collection, images);
   }
+
+  return [...collections.entries()]
+    .map(([name, images]) => {
+      const orderedImages = images.slice().sort(compareImages);
+      return {
+        name,
+        cover: orderedImages[0],
+        images: orderedImages,
+        path: `/${category}/${encodeURIComponent(name)}`,
+        collectionOrder: Math.min(...orderedImages.map((image) => image.collectionOrder)),
+      };
+    })
+    .sort(
+      (left, right) =>
+        left.collectionOrder - right.collectionOrder ||
+        left.name.localeCompare(right.name, "en"),
+    )
+    .map((project) => ({
+      name: project.name,
+      cover: project.cover,
+      images: project.images,
+      path: project.path,
+    }));
 }
 
-// Grab one cover image from EVERY project across all categories for the Home page
 export function getHomeGridImages(): ProjectData[] {
-  const categories = ['img/projects', 'img/brands', 'img/portraits'];
+  const categories = ["img/projects", "img/brands", "img/portraits"];
   let allProjects: ProjectData[] = [];
 
   for (const category of categories) {
     allProjects = [...allProjects, ...getProjectsWithCovers(category)];
   }
 
-  // Shuffle array using Fisher-Yates algorithm for an asymmetrical look
   for (let i = allProjects.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [allProjects[i], allProjects[j]] = [allProjects[j], allProjects[i]];

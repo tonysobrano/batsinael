@@ -1,7 +1,11 @@
 import { ImageGrid } from "@/components/ImageGrid";
-import { getImagesFromDirectory } from "@/lib/images";
+import { getImagesFromDirectory, getProjectsWithCovers } from "@/lib/images";
 
-export const dynamic = 'force-dynamic';
+export function generateStaticParams() {
+  return getProjectsWithCovers("img/brands").map((brand) => ({
+    brand: brand.name,
+  }));
+}
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const resolvedParams = await params;

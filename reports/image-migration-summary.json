@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-07-23T15:15:27.001Z",
+  "settings": {
+    "outputFormat": "webp",
+    "quality": 92,
+    "effort": 6,
+    "maximumLongEdge": 3000,
+    "withoutEnlargement": true
+  },
+  "totalSourceImages": 128,
+  "totalSourceBytes": 552276335,
+  "totalBlobBytes": 129564918,
+  "averageSourceBytes": 4314659,
+  "averageBlobBytes": 1012226,
+  "compressionRatio": 0.23460161116626516,
+  "uploadedCount": 128,
+  "replacedCount": 0,
+  "skippedCount": 0,
+  "failedCount": 0,
+  "manifestCount": 128,
+  "storage": {
+    "limitBytes": 1000000000,
+    "usedBytes": 129564918,
+    "usagePercent": 12.9564918,
+    "remainingBytes": 870435082
+  },
+  "transfer": {
+    "limitBytes": 10000000000,
+    "estimationBasis": "Conservative full Blob derivative sizes before responsive next/image savings",
+    "scenarios": {
+      "homepageOnly": {
+        "bytesPerVisit": 18066760,
+        "visitorsPer10GB": 553
+      },
+      "homepagePlusOneAverageGallery": {
+        "bytesPerVisit": 25077721,
+        "visitorsPer10GB": 398
+      },
+      "thirtyImagesViewed": {
+        "bytesPerVisit": 30366778,
+        "visitorsPer10GB": 329
+      }
+    }
+  },
+  "failed": []
+}

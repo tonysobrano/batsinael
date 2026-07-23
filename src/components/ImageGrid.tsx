@@ -4,9 +4,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { SingleImageView } from "./SingleImageView";
 import { SkeletonImage } from "./SkeletonImage";
+import type { PortfolioImage } from "@/lib/images";
 
 interface ImageGridProps {
-  images: string[];
+  images: PortfolioImage[];
 }
 
 export function ImageGrid({ images }: ImageGridProps) {
@@ -19,22 +20,25 @@ export function ImageGrid({ images }: ImageGridProps) {
   return (
     <>
       <div className="columns-1 gap-x-[22px] sm:columns-2 md:columns-3 lg:columns-4">
-        {images.map((src, i) => (
-          <motion.div
-            key={src}
+        {images.map((image, i) => (
+          <motion.button
+            type="button"
+            key={image.relativePath}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.05 }}
-            className="group relative cursor-pointer break-inside-avoid mb-[34px]"
+            className="group relative mb-[34px] block w-full cursor-pointer break-inside-avoid appearance-none border-0 bg-transparent p-0 text-left"
             onClick={() => setSelectedIndex(i)}
+            aria-label={`Open gallery image ${i + 1}`}
           >
             <SkeletonImage
-              src={src}
+              image={image}
               alt={`Gallery image ${i + 1}`}
               wrapperClassName="min-h-0"
               className="group-hover:opacity-90"
+              eager={i < 4}
             />
-          </motion.div>
+          </motion.button>
         ))}
       </div>
 
