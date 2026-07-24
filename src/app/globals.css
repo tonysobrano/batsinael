@@ -103,7 +103,6 @@ a {
 .site-nav a:hover,
 .site-nav a.is-active {
   color: #000;
-  font-weight: 600;
 }
 
 .is-preloading .site-header,
@@ -337,7 +336,6 @@ a {
 .works-toolbar button:hover,
 .works-toolbar button.is-active {
   color: #000;
-  font-weight: 600;
 }
 
 .works-desktop-grid {
