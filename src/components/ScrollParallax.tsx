@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const mediaSelector = ".work-card-image, .project-overview-grid button";
+const mediaSelector = ".project-overview-grid button";
 
 export function ScrollParallax() {
   const pathname = usePathname();

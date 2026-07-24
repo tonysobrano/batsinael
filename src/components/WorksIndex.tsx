@@ -16,36 +16,19 @@ interface WorksIndexProps {
   initialFilter?: Filter;
 }
 
-const allWorksDesktopSlots = [
-  1, 2, 3, 5,
-  6, 8, 9, 10,
-  12, 13, 15,
-  16, 17, 19, 20,
-  22, 23, 24,
-];
-
 function WorkCard({
   project,
   category,
   index,
   mobile = false,
-  layoutSlot,
 }: {
   project: ProjectData;
   category: string;
   index: number;
   mobile?: boolean;
-  layoutSlot?: number;
 }) {
-  const gridPosition = layoutSlot
-    ? {
-        gridColumn: ((layoutSlot - 1) % 5) + 1,
-        gridRow: Math.floor((layoutSlot - 1) / 5) + 1,
-      }
-    : undefined;
-
   return (
-    <Link href={project.path} className="work-card" style={gridPosition}>
+    <Link href={project.path} className="work-card">
       <div className="work-card-image">
         <RotatingProjectImage
           images={project.images}
@@ -55,7 +38,7 @@ function WorkCard({
           sizes={
             mobile
               ? "168px"
-              : "(max-width: 1100px) calc((100vw - 75px) / 3), calc((100vw - 135px) / 4)"
+              : "(max-width: 1199px) calc((100vw - 131px) / 4), calc((100vw - 156px) / 5)"
           }
         />
       </div>
@@ -116,9 +99,6 @@ export function WorksIndex({
             project={project}
             category={group.label}
             index={index}
-            layoutSlot={
-              filter === "all" ? allWorksDesktopSlots[index] : undefined
-            }
           />
         ))}
       </div>

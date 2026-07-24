@@ -69,11 +69,12 @@ export function RotatingProjectImage({
           key={image.relativePath}
           src={image.url}
           alt={imageIndex === 0 ? name : ""}
-          fill
-          quality={75}
+          width={image.width}
+          height={image.height}
+          quality={90}
           preload={preload && imageIndex === 0}
           sizes={sizes}
-          className={`rotating-project-image__slide object-cover${
+          className={`rotating-project-image__slide${
             imageIndex === activeIndex ? " is-active" : ""
           }`}
         />
