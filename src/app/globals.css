@@ -317,6 +317,7 @@ a {
   width: 45%;
   grid-template-columns: 1fr 2fr;
   font-size: 12px;
+  font-weight: 600;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -336,6 +337,7 @@ a {
 .works-toolbar button:hover,
 .works-toolbar button.is-active {
   color: #000;
+  font-weight: 700;
 }
 
 .works-desktop-grid {
