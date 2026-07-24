@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { RotatingProjectImage } from "@/components/RotatingProjectImage";
 import type {
   PortfolioCategory,
   PortfolioGroup,
@@ -47,18 +47,16 @@ function WorkCard({
   return (
     <Link href={project.path} className="work-card" style={gridPosition}>
       <div className="work-card-image">
-        <Image
-          src={project.cover.url}
-          alt={project.name}
-          fill
-          quality={75}
-          priority={index < (mobile ? 2 : 4)}
+        <RotatingProjectImage
+          images={project.images}
+          name={project.name}
+          preload={index < (mobile ? 2 : 4)}
+          seed={project.path}
           sizes={
             mobile
               ? "168px"
               : "(max-width: 1100px) calc((100vw - 75px) / 3), calc((100vw - 135px) / 4)"
           }
-          className="object-cover"
         />
       </div>
       <div className="work-card-meta">

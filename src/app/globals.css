@@ -28,7 +28,7 @@ body {
   background: #fff;
   color: #000;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1;
 }
 
@@ -76,20 +76,21 @@ a {
 .site-nav {
   position: absolute;
   top: 31px;
-  font-size: 11px;
   line-height: 1;
   pointer-events: auto;
 }
 
 .site-brand {
   left: var(--page-gutter);
-  font-weight: 400;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .site-nav {
   right: var(--page-gutter);
   display: flex;
   gap: 5px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -133,7 +134,7 @@ a {
   right: 26%;
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1;
   text-transform: uppercase;
@@ -169,10 +170,11 @@ a {
 }
 
 .selected-media-frame {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: media-in 320ms ease-out both;
+  animation: media-in 700ms ease both;
 }
 
 .selected-media-frame img {
@@ -257,9 +259,9 @@ a {
   position: relative;
   z-index: 2;
   margin: 0;
-  font-size: 36px;
+  font-size: 37px;
   font-weight: 500;
-  line-height: 36px;
+  line-height: 37px;
   text-align: center;
   text-transform: uppercase;
 }
@@ -307,7 +309,7 @@ a {
   display: grid;
   width: 45%;
   grid-template-columns: 1fr 2fr;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -352,12 +354,38 @@ a {
   height: 104% !important;
   animation: none;
   transform: translate3d(0, var(--scroll-parallax-y, 0), 0);
-  transition: opacity 180ms ease;
+  opacity: 0;
   will-change: transform;
 }
 
-.work-card:hover .work-card-image img {
+/* Three-image project thumbnail rotation */
+.rotating-project-image {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.rotating-project-image__slide:first-child {
+  opacity: 1;
+}
+
+.work-card:hover .rotating-project-image {
   opacity: 0.92;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rotating-project-image__slide:nth-child(1) {
+    animation: work-image-one 9.6s ease-in-out var(--rotation-delay) infinite;
+  }
+
+  .rotating-project-image__slide:nth-child(2) {
+    animation: work-image-two 9.6s ease-in-out var(--rotation-delay) infinite;
+  }
+
+  .rotating-project-image__slide:nth-child(3) {
+    animation: work-image-three 9.6s ease-in-out var(--rotation-delay) infinite;
+  }
 }
 
 .work-card-meta {
@@ -366,7 +394,7 @@ a {
   justify-content: space-between;
   gap: 10px;
   padding-top: 12px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1;
   text-transform: uppercase;
@@ -426,7 +454,7 @@ a {
   left: 0;
   width: 100%;
   height: 70px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
 }
 
@@ -439,7 +467,8 @@ a {
 
 .project-gallery-brand {
   left: var(--page-gutter);
-  font-weight: 400;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .project-gallery-name {
@@ -535,14 +564,14 @@ a {
 
 .about-intro {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.2;
 }
 
 .about-links {
   margin: 31px 0 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.2;
 }
@@ -576,7 +605,7 @@ a {
   bottom: 31px;
   left: 0;
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
 }
@@ -587,6 +616,49 @@ a {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes work-image-one {
+  0%,
+  30% {
+    opacity: 1;
+  }
+  34%,
+  96% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes work-image-two {
+  0%,
+  30% {
+    opacity: 0;
+  }
+  34%,
+  63% {
+    opacity: 1;
+  }
+  67%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes work-image-three {
+  0%,
+  63% {
+    opacity: 0;
+  }
+  67%,
+  96% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -716,7 +788,7 @@ a {
     justify-content: space-between;
     min-height: 34px;
     padding: 0 15px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     line-height: 1;
     text-transform: uppercase;
@@ -730,8 +802,8 @@ a {
   }
 
   .portfolio-intro h1 {
-    font-size: 20px;
-    line-height: 22px;
+    font-size: 21px;
+    line-height: 23px;
   }
 
   .works-page {
@@ -755,7 +827,7 @@ a {
   .works-mobile-group h1 {
     margin: 0 15px 30px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     line-height: 1;
     text-transform: uppercase;
@@ -885,13 +957,13 @@ a {
 
   .about-intro {
     max-width: 350px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.2;
   }
 
   .about-links {
     margin-top: 30px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.2;
   }
 

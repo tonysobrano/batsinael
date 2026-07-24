@@ -29,7 +29,7 @@ export interface SelectedGalleryItem {
   name: string;
   category: string;
   path: string;
-  image: PortfolioImage;
+  images: PortfolioImage[];
 }
 
 const manifest: readonly BlobManifestEntry[] = blobManifest;
@@ -146,7 +146,7 @@ export function getSelectedGalleryItems(): SelectedGalleryItem[] {
       name: project.name,
       category: group.label,
       path: project.path,
-      image: project.cover,
+      images: project.images.slice(0, 3),
     })),
   );
 }

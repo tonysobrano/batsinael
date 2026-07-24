@@ -12,15 +12,18 @@ type IntroPhase = "visible" | "exiting" | "hidden";
 
 export function SelectedGallery({ items }: SelectedGalleryProps) {
   const [index, setIndex] = useState(0);
+  const [imageIndex, setImageIndex] = useState(0);
   const [introPhase, setIntroPhase] = useState<IntroPhase>("visible");
   const touchStartX = useRef<number | null>(null);
   const current = items[index];
 
   const next = useCallback(() => {
+    setImageIndex(0);
     setIndex((value) => (value + 1) % items.length);
   }, [items.length]);
 
   const previous = useCallback(() => {
+    setImageIndex(0);
     setIndex((value) => (value - 1 + items.length) % items.length);
   }, [items.length]);
 
@@ -62,9 +65,29 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [next, previous]);
 
+  const selectedImages = current?.images.slice(0, 3) ?? [];
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reduceMotion || introPhase !== "hidden" || selectedImages.length < 2) {
+      return;
+    }
+
+    const rotationTimer = window.setInterval(() => {
+      setImageIndex((value) => (value + 1) % selectedImages.length);
+    }, 3200);
+
+    return () => window.clearInterval(rotationTimer);
+  }, [current?.path, introPhase, selectedImages.length]);
+
   if (!current) {
     return null;
   }
+
+  const selectedImage = selectedImages[imageIndex] ?? selectedImages[0];
 
   const handleTouchEnd = (event: React.TouchEvent) => {
     if (touchStartX.current === null) return;
@@ -98,17 +121,22 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
       </div>
 
       <div className="selected-media">
-        <div key={current.image.relativePath} className="selected-media-frame">
-          <Image
-            src={current.image.url}
-            alt={current.name}
-            width={current.image.width}
-            height={current.image.height}
-            priority={index === 0}
-            quality={90}
-            sizes="(max-width: 767px) calc(100vw - 30px), 64vw"
-          />
-        </div>
+        {selectedImage ? (
+          <div
+            key={selectedImage.relativePath}
+            className="selected-media-frame"
+          >
+            <Image
+              src={selectedImage.url}
+              alt={current.name}
+              width={selectedImage.width}
+              height={selectedImage.height}
+              preload={index === 0 && imageIndex === 0}
+              quality={90}
+              sizes="(max-width: 767px) calc(100vw - 30px), 64vw"
+            />
+          </div>
+        ) : null}
         <button
           type="button"
           className="selected-zone selected-zone--previous"
