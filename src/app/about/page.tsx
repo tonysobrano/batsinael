@@ -33,14 +33,14 @@ export default function About() {
 
         <dl className="about-footer">
           <div>
-            <dt>Website</dt>
+            <dt>Website by</dt>
             <dd>
               <a
                 href="https://primecreative.agency/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                by Prime Creative
+                Prime Creative
               </a>
             </dd>
           </div>
