@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Julian Noni–inspired portfolio system */
+/* Julian Noni-inspired portfolio system */
 @theme {
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -575,6 +575,7 @@ a {
   line-height: 1.2;
 }
 
+.about-practice,
 .about-links {
   margin: 31px 0 0;
   font-size: 17px;
@@ -582,12 +583,19 @@ a {
   line-height: 1.2;
 }
 
+.about-practice + .about-links {
+  margin-top: 18px;
+}
+
+.about-practice > div,
 .about-links > div,
 .about-footer > div {
   display: grid;
   grid-template-columns: 1fr 1.1fr;
 }
 
+.about-practice dt,
+.about-practice dd,
 .about-links dt,
 .about-links dd,
 .about-footer dt,
@@ -595,6 +603,7 @@ a {
   margin: 0;
 }
 
+.about-practice dd,
 .about-links dd,
 .about-footer dd {
   color: var(--muted);
@@ -940,17 +949,24 @@ a {
     line-height: 1.2;
   }
 
+  .about-practice,
   .about-links {
     margin-top: 30px;
     font-size: 14px;
     line-height: 1.2;
   }
 
+  .about-practice + .about-links {
+    margin-top: 18px;
+  }
+
+  .about-practice > div,
   .about-links > div,
   .about-footer > div {
     grid-template-columns: 135px 1fr;
   }
 
+  .about-practice dd,
   .about-links dd,
   .about-footer dd {
     text-align: left;

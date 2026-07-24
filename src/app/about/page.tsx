@@ -8,6 +8,13 @@ export default function About() {
           and choreography, finding beauty in unlikely places.
         </p>
 
+        <dl className="about-practice">
+          <div>
+            <dt>Practice</dt>
+            <dd>Photography / Direction / Choreography</dd>
+          </div>
+        </dl>
+
         <dl className="about-links">
           <div>
             <dt>Email</dt>
