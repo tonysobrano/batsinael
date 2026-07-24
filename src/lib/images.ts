@@ -128,14 +128,14 @@ export function getPortfolioGroups(): PortfolioGroup[] {
       projects: getProjectsWithCovers("img/projects"),
     },
     {
-      id: "brands",
-      label: "Brands",
-      projects: getProjectsWithCovers("img/brands"),
-    },
-    {
       id: "portraits",
       label: "Portraits",
       projects: getProjectsWithCovers("img/portraits"),
+    },
+    {
+      id: "brands",
+      label: "Brands",
+      projects: getProjectsWithCovers("img/brands"),
     },
   ];
 }
@@ -146,7 +146,7 @@ export function getSelectedGalleryItems(): SelectedGalleryItem[] {
       name: project.name,
       category: group.label,
       path: project.path,
-      images: project.images.slice(0, 3),
+      images: project.images.slice(0, 5),
     })),
   );
 }

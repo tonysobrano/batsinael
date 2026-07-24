@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SelectedGalleryItem } from "@/lib/images";
 
@@ -65,7 +66,7 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [next, previous]);
 
-  const selectedImages = current?.images.slice(0, 3) ?? [];
+  const selectedImages = current?.images.slice(0, 5) ?? [];
 
   useEffect(() => {
     const reduceMotion = window.matchMedia(
@@ -78,7 +79,7 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
 
     const rotationTimer = window.setInterval(() => {
       setImageIndex((value) => (value + 1) % selectedImages.length);
-    }, 3200);
+    }, 3000);
 
     return () => window.clearInterval(rotationTimer);
   }, [current?.path, introPhase, selectedImages.length]);
@@ -112,8 +113,10 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
     >
       <div className="selected-desktop-meta" aria-live="polite">
         <p>
-          <strong>{current.name}</strong>
-          <span>{current.category}</span>
+          <Link href={current.path} className="selected-project-link">
+            <strong>{current.name}</strong>
+            <span>{current.category}</span>
+          </Link>
         </p>
         <p className="selected-counter">
           {index + 1} <span>|</span> {items.length}
@@ -153,8 +156,10 @@ export function SelectedGallery({ items }: SelectedGalleryProps) {
 
       <div className="selected-mobile-meta" aria-live="polite">
         <p>
-          <strong>{current.name}</strong>
-          <span>{current.category}</span>
+          <Link href={current.path} className="selected-project-link">
+            <strong>{current.name}</strong>
+            <span>{current.category}</span>
+          </Link>
         </p>
         <p>
           {index + 1} <span>|</span> {items.length}

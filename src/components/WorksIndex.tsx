@@ -49,9 +49,9 @@ function WorkCard({
       <div className="work-card-image">
         <RotatingProjectImage
           images={project.images}
+          mobile={mobile}
           name={project.name}
           preload={index < (mobile ? 2 : 4)}
-          seed={project.path}
           sizes={
             mobile
               ? "168px"

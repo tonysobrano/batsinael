@@ -82,7 +82,7 @@ a {
 
 .site-brand {
   left: var(--page-gutter);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -154,6 +154,11 @@ a {
 .selected-mobile-meta strong + span {
   margin-left: 4px;
   color: var(--muted);
+}
+
+.selected-project-link {
+  display: inline-flex;
+  align-items: baseline;
 }
 
 .selected-counter span,
@@ -355,10 +360,11 @@ a {
   animation: none;
   transform: translate3d(0, var(--scroll-parallax-y, 0), 0);
   opacity: 0;
-  will-change: transform;
+  transition: opacity 650ms ease;
+  will-change: transform, opacity;
 }
 
-/* Three-image project thumbnail rotation */
+/* Project thumbnail rotation */
 .rotating-project-image {
   position: absolute;
   inset: 0;
@@ -366,26 +372,12 @@ a {
   transition: opacity 180ms ease;
 }
 
-.rotating-project-image__slide:first-child {
+.rotating-project-image__slide.is-active {
   opacity: 1;
 }
 
 .work-card:hover .rotating-project-image {
   opacity: 0.92;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .rotating-project-image__slide:nth-child(1) {
-    animation: work-image-one 9.6s ease-in-out var(--rotation-delay) infinite;
-  }
-
-  .rotating-project-image__slide:nth-child(2) {
-    animation: work-image-two 9.6s ease-in-out var(--rotation-delay) infinite;
-  }
-
-  .rotating-project-image__slide:nth-child(3) {
-    animation: work-image-three 9.6s ease-in-out var(--rotation-delay) infinite;
-  }
 }
 
 .work-card-meta {
@@ -467,7 +459,7 @@ a {
 
 .project-gallery-brand {
   left: var(--page-gutter);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -616,49 +608,6 @@ a {
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes work-image-one {
-  0%,
-  30% {
-    opacity: 1;
-  }
-  34%,
-  96% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes work-image-two {
-  0%,
-  30% {
-    opacity: 0;
-  }
-  34%,
-  63% {
-    opacity: 1;
-  }
-  67%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes work-image-three {
-  0%,
-  63% {
-    opacity: 0;
-  }
-  67%,
-  96% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
   }
 }
 
