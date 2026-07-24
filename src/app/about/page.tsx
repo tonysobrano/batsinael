@@ -33,8 +33,16 @@ export default function About() {
 
         <dl className="about-footer">
           <div>
-            <dt>Practice</dt>
-            <dd>Photography / Direction / Choreography</dd>
+            <dt>Website</dt>
+            <dd>
+              <a
+                href="https://primecreative.agency/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                by Prime Creative
+              </a>
+            </dd>
           </div>
         </dl>
       </div>
